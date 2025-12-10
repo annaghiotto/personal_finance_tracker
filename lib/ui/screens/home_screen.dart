@@ -7,20 +7,26 @@ import 'package:personal_finance_tracker/cubit/transactions/transaction_state.da
 
 import 'package:personal_finance_tracker/data/models/transaction.dart';
 import 'package:personal_finance_tracker/ui/screens/add_transaction_sheet.dart';
+import 'package:personal_finance_tracker/ui/screens/settings_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Personal Finance Tracker'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.brightness_6),
+            icon: const Icon(Icons.settings),
             onPressed: () {
-              context.read<SettingsCubit>().toggleTheme();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const SettingsScreen(),
+                ),
+              );
             },
           ),
         ],
@@ -81,6 +87,7 @@ class _BalanceSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final currencySymbol = context.watch<SettingsCubit>().state.currencySymbol;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -93,7 +100,7 @@ class _BalanceSection extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            balance.toStringAsFixed(2),
+            "$currencySymbol ${balance.toStringAsFixed(2)}",
             style: textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
