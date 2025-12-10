@@ -80,7 +80,6 @@ class _BalanceSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPositive = balance >= 0;
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
@@ -96,7 +95,6 @@ class _BalanceSection extends StatelessWidget {
           Text(
             balance.toStringAsFixed(2),
             style: textTheme.headlineMedium?.copyWith(
-              color: isPositive ? Colors.green : Colors.red,
               fontWeight: FontWeight.bold,
             ),
           ),
