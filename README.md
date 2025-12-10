@@ -28,7 +28,7 @@ lib/
  ├── ui/
  │    ├── screens/
  │    └── theme/
- ├── theme/
+ ├── test/
  └── main.dart
  ```
 
@@ -36,6 +36,12 @@ lib/
  ```
 flutter pub get
 flutter run
+ ```
+
+##  🧪 Testing
+Run tests with:
+ ```
+flutter test
  ```
 
 ## 🚀 Future Improvements
@@ -74,6 +80,7 @@ The architecture separates between UI, state management, and data layer:
 - Validation is minimal
 - Limited filtering (basic type filter only)
 - UI was adapted using Claude, providing an image of the desired style and the code for the page to update
+- Test cases were ampliated with Github Copilot
 
 ### Estimated Time Spent
-The project took about 2 and a half hours to reach the basic requirements. The implementation of bonus requests, like edit/deletion of transactions and completion of the readme took another hour, for a total of 3 and a half hours of time spent.
+The project took about 2 and a half hours to reach the basic requirements. The implementation of bonus requests, like edit/deletion of transactions, testing, and completion of the readme took another hour and a half, for a total of approx 4 hours of time spent.
