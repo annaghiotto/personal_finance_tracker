@@ -18,6 +18,7 @@ class TransactionCubit extends Cubit<TransactionState> {
 
     try {
       final all = _repository.getAll(); // List<Transaction>
+      all.sort((a, b) => b.date.compareTo(a.date));
       final filtered = _applyFilter(all, state.filter);
       final balance = _calculateBalance(all);
 
@@ -57,14 +58,28 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   /// Delete transaction at given index and reload data
-  Future<void> deleteTransaction(int index) async {
+  Future<void> deleteTransaction(Transaction transaction) async {
+    final all = state.allTransactions;
+
+    final index = all.indexOf(transaction);
+    if (index == -1) {
+      return;
+    }
+
     await _repository.delete(index);
     await loadTransactions();
   }
 
   /// Update transaction at given index and reload data
-  Future<void> updateTransaction(int index, Transaction t) async {
-    await _repository.update(index, t);
+  Future<void> updateTransaction({
+    required Transaction oldTransaction,
+    required Transaction newTransaction,
+  }) async {
+    final all = state.allTransactions;
+    final index = all.indexOf(oldTransaction);
+    if (index == -1) return;
+
+    await _repository.update(index, newTransaction);
     await loadTransactions();
   }
 

@@ -5,12 +5,10 @@ import 'package:personal_finance_tracker/data/models/transaction.dart';
 
 class AddTransactionSheet extends StatefulWidget {
   final Transaction? initialTransaction;
-  final int? index; // index in the list for cubit editing
 
   const AddTransactionSheet({
     super.key,
     this.initialTransaction,
-    this.index,
   });
 
   bool get isEditing => initialTransaction != null;
@@ -33,16 +31,22 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   @override
   void initState() {
     super.initState();
-
     final tx = widget.initialTransaction;
     if (tx != null) {
-      _amountController.text = tx.amount.toStringAsFixed(2);
+      _amountController.text = tx.amount.toString();
       _categoryController.text = tx.category;
       _notesController.text = tx.notes ?? '';
       _type = tx.type;
       _date = tx.date;
-      _time = TimeOfDay.fromDateTime(tx.date);
     }
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _categoryController.dispose();
+    _notesController.dispose();
+    super.dispose();
   }
 
   @override
@@ -96,49 +100,23 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                           ),
                     ),
 
-                    if (widget.isEditing && widget.index != null)
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        tooltip: 'Delete',
-                        onPressed: () async {
-                          final shouldDelete = await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) {
-                              return AlertDialog(
-                                title: const Text('Delete transaction'),
-                                content: const Text(
-                                  'Are you sure you want to delete this transaction?',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.of(ctx).pop(false),
-                                    child: Text(
-                                      'Cancel',
-                                      style: Theme.of(context).textTheme.bodyMedium,
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.of(ctx).pop(true),
-                                    child: Text(
-                                      'Delete',
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-
-                          if (shouldDelete == true) {
-                            await context
-                                .read<TransactionCubit>()
-                                .deleteTransaction(widget.index!);
-
-                            if (context.mounted) {
-                              Navigator.of(context).pop();
-                            }
-                          }
+                    if (widget.initialTransaction != null) ...[
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: Colors.black),
+                        label: Text(
+                          'Delete',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        onPressed: () {
+                          final tx = widget.initialTransaction!;
+                          context.read<TransactionCubit>().deleteTransaction(tx);
+                          Navigator.pop(context);
                         },
                       ),
+                    ]
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -368,19 +346,11 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   onPressed: () {
                     if (!_formKey.currentState!.validate()) return;
 
-                    final txDateTime = DateTime(
-                      _date.year,
-                      _date.month,
-                      _date.day,
-                      _time.hour,
-                      _time.minute,
-                    );
-
                     final tx = Transaction(
                       amount: double.parse(_amountController.text),
                       type: _type,
                       category: _categoryController.text,
-                      date: txDateTime,
+                      date: _date,
                       notes: _notesController.text.isEmpty
                           ? null
                           : _notesController.text,
@@ -388,31 +358,18 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
 
                     final cubit = context.read<TransactionCubit>();
 
-                    if (widget.isEditing && widget.index != null) {
-                      // EDIT
-                      cubit.updateTransaction(widget.index!, tx);
-                    } else {
-                      // ADD
+                    if (widget.initialTransaction == null) {
                       cubit.addTransaction(tx);
+                    } else {
+                      cubit.updateTransaction(
+                        oldTransaction: widget.initialTransaction!,
+                        newTransaction: tx,
+                      );
                     }
 
                     Navigator.pop(context);
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: Text(
-                    widget.isEditing ? 'Save Changes' : 'Add Transaction',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: Text(widget.initialTransaction == null ? 'Save' : 'Update'),
                 ),
                 const SizedBox(height: 8),
               ],
@@ -421,14 +378,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _categoryController.dispose();
-    _notesController.dispose();
-    super.dispose();
   }
 }
 

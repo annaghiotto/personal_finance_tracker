@@ -306,7 +306,6 @@ class _TransactionList extends StatelessWidget {
         const SizedBox(height: 8),
         Expanded(
           child: ListView.separated(
-            reverse: true,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             itemCount: transactions.length,
             separatorBuilder: (context, index) => const SizedBox(height: 8),
@@ -353,7 +352,6 @@ class _TransactionCard extends StatelessWidget {
                 ),
                 child: AddTransactionSheet(
                   initialTransaction: transaction,
-                  index: index,
                 ),
               );
             },
