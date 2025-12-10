@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:personal_finance_tracker/cubit/theme/theme_cubit.dart';
+import 'package:personal_finance_tracker/cubit/settings/settings_cubit.dart';
 import 'package:personal_finance_tracker/cubit/transactions/transaction_cubit.dart';
 import 'package:personal_finance_tracker/cubit/transactions/transaction_state.dart';
 
@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.brightness_6),
             onPressed: () {
-              context.read<ThemeCubit>().toggleTheme();
+              context.read<SettingsCubit>().toggleTheme();
             },
           ),
         ],

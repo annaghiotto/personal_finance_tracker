@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:personal_finance_tracker/ui/theme/app_theme.dart';
-import 'package:personal_finance_tracker/cubit/theme/theme_cubit.dart';
-import 'package:personal_finance_tracker/cubit/transactions/transaction_cubit.dart';
+import 'package:personal_finance_tracker/cubit/settings/settings_cubit.dart';
+import 'package:personal_finance_tracker/cubit/settings/settings_state.dart';
 import 'package:personal_finance_tracker/ui/screens/home_screen.dart';
+import 'package:personal_finance_tracker/ui/theme/app_theme.dart';
+import 'package:personal_finance_tracker/cubit/transactions/transaction_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/models/transaction.dart';
@@ -47,14 +48,14 @@ class MyApp extends StatelessWidget {
               TransactionCubit(transactionRepository)..loadTransactions(),
         ),
         BlocProvider(
-          create: (_) => ThemeCubit(prefs),
+          create: (_) => SettingsCubit(prefs),
         ),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, themeMode) {
+      child: BlocBuilder<SettingsCubit, SettingsState>(
+        builder: (context, settingsState) {
           return MaterialApp(
             title: 'Personal Finance Tracker',
-            themeMode: themeMode,
+            themeMode: settingsState.themeMode,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             home: HomeScreen(),
