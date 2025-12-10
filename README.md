@@ -1,13 +1,8 @@
 # Personal Finance Tracker
 Simple personal finance tracker app that allows users to log expenses and income, view their balance, and categorize transactions.
 
-## 📸 Screenshots
+<img width="3125" height="1238" alt="Personal Finance Tracker  (1)" src="https://github.com/user-attachments/assets/b9d90526-192f-4f05-af45-e18b49226817" />
 
-### Home Screen
-<img width="440" height="700" alt="Screenshot 2025-12-10 224842" src="https://github.com/user-attachments/assets/a17acde1-8e5d-440e-a99a-a8375cbfb602" />
-
-### Add Transaction
-<img width="440" height="700" alt="Screenshot 2025-12-10 224642" src="https://github.com/user-attachments/assets/d14cbf36-6d7a-41be-8be4-dbd80cee47be" />
 
 ## Features
 ➕ Add and edit transactions (income or expense) with amount, category, date, and optional notes + Form validation\
