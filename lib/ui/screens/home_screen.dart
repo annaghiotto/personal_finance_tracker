@@ -6,6 +6,7 @@ import 'package:personal_finance_tracker/cubit/transactions/transaction_cubit.da
 import 'package:personal_finance_tracker/cubit/transactions/transaction_state.dart';
 
 import 'package:personal_finance_tracker/data/models/transaction.dart';
+import 'package:personal_finance_tracker/ui/screens/add_transaction_sheet.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -31,7 +32,7 @@ class HomeScreen extends StatelessWidget {
           }
 
           if (state.errorMessage != null) {
-            return Center(child: Text('Errore: ${state.errorMessage}'));
+            return Center(child: Text('Error: ${state.errorMessage}'));
           }
 
           return Column(
@@ -57,28 +58,18 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _addDummyTransaction(context);
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (context) => BlocProvider.value(
+              value: context.read<TransactionCubit>(),
+              child: AddTransactionSheet(),
+            ),
+          );
         },
         child: const Icon(Icons.add),
       ),
     );
-  }
-
-  /// Per ora: aggiunge una transazione "dummy" (di test) per verificare
-  /// che Cubit + Hive + UI funzionino.
-  void _addDummyTransaction(BuildContext context) {
-    final now = DateTime.now();
-    final isIncome = now.second.isEven; // giusto per variare un po'
-
-    final tx = Transaction(
-      amount: 10.0,
-      type: isIncome ? 'income' : 'expense',
-      category: isIncome ? 'Test Income' : 'Test Expense',
-      date: now,
-      notes: 'Dummy transaction',
-    );
-
-    context.read<TransactionCubit>().addTransaction(tx);
   }
 }
 
