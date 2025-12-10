@@ -4,7 +4,16 @@ import 'package:personal_finance_tracker/cubit/transactions/transaction_cubit.da
 import 'package:personal_finance_tracker/data/models/transaction.dart';
 
 class AddTransactionSheet extends StatefulWidget {
-  const AddTransactionSheet({super.key});
+  final Transaction? initialTransaction;
+  final int? index; // index in the list for cubit editing
+
+  const AddTransactionSheet({
+    super.key,
+    this.initialTransaction,
+    this.index,
+  });
+
+  bool get isEditing => initialTransaction != null;
 
   @override
   State<AddTransactionSheet> createState() => _AddTransactionSheetState();
@@ -17,9 +26,24 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   final _categoryController = TextEditingController();
   final _notesController = TextEditingController();
 
-  String _type = 'expense'; // default to expense like in the design
+  String _type = 'expense'; // default
   DateTime _date = DateTime.now();
   TimeOfDay _time = TimeOfDay.now();
+
+  @override
+  void initState() {
+    super.initState();
+
+    final tx = widget.initialTransaction;
+    if (tx != null) {
+      _amountController.text = tx.amount.toStringAsFixed(2);
+      _categoryController.text = tx.category;
+      _notesController.text = tx.notes ?? '';
+      _type = tx.type;
+      _date = tx.date;
+      _time = TimeOfDay.fromDateTime(tx.date);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,12 +85,61 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                 const SizedBox(height: 20),
                 
                 // Title
-                Text(
-                  'Add Transaction',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.isEditing ? 'Edit Transaction' : 'Add Transaction',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+
+                    if (widget.isEditing && widget.index != null)
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        tooltip: 'Delete',
+                        onPressed: () async {
+                          final shouldDelete = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) {
+                              return AlertDialog(
+                                title: const Text('Delete transaction'),
+                                content: const Text(
+                                  'Are you sure you want to delete this transaction?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(ctx).pop(false),
+                                    child: Text(
+                                      'Cancel',
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.of(ctx).pop(true),
+                                    child: Text(
+                                      'Delete',
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (shouldDelete == true) {
+                            await context
+                                .read<TransactionCubit>()
+                                .deleteTransaction(widget.index!);
+
+                            if (context.mounted) {
+                              Navigator.of(context).pop();
+                            }
+                          }
+                        },
                       ),
+                  ],
                 ),
                 const SizedBox(height: 24),
 
@@ -295,7 +368,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   onPressed: () {
                     if (!_formKey.currentState!.validate()) return;
 
-                    // Combine date and time
                     final txDateTime = DateTime(
                       _date.year,
                       _date.month,
@@ -314,7 +386,16 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                           : _notesController.text,
                     );
 
-                    context.read<TransactionCubit>().addTransaction(tx);
+                    final cubit = context.read<TransactionCubit>();
+
+                    if (widget.isEditing && widget.index != null) {
+                      // EDIT
+                      cubit.updateTransaction(widget.index!, tx);
+                    } else {
+                      // ADD
+                      cubit.addTransaction(tx);
+                    }
+
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
@@ -326,8 +407,8 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                     ),
                   ),
                   child: Text(
-                    'Add Transaction',
-                    style: TextStyle(
+                    widget.isEditing ? 'Save Changes' : 'Add Transaction',
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),

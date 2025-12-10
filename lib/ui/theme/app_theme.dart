@@ -26,12 +26,10 @@ class AppTheme {
       primary: _lightPrimary,
       secondary: _lightPrimary,
       surface: _lightSurface,
-      background: _lightBackground,
       error: Color(0xFFDC3545),
       onPrimary: Color(0xFF1A1A1A),
       onSecondary: Color(0xFF1A1A1A),
       onSurface: _lightText,
-      onBackground: _lightText,
       onError: Color(0xFFFFFFFF),
     ),
     

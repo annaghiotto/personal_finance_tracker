@@ -90,16 +90,10 @@ class _HeaderSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hi, User',
+                'Finance Tracker',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 4),
-              Text(
-                'Welcome back to your Personal Finance Tracker',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
-                    ),
-              ),
             ],
           ),
           IconButton(
@@ -317,7 +311,10 @@ class _TransactionList extends StatelessWidget {
             itemCount: transactions.length,
             separatorBuilder: (context, index) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
-              return _TransactionCard(transaction: transactions[index]);
+              return _TransactionCard(
+                transaction: transactions[index],
+                index: index,
+              );
             },
           ),
         ),
@@ -328,8 +325,12 @@ class _TransactionList extends StatelessWidget {
 
 class _TransactionCard extends StatelessWidget {
   final Transaction transaction;
+  final int index;
 
-  const _TransactionCard({required this.transaction});
+  const _TransactionCard({
+    required this.transaction,
+    required this.index,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -341,12 +342,21 @@ class _TransactionCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to transaction details
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Transaction details: ${transaction.category}'),
-              duration: const Duration(seconds: 1),
-            ),
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (ctx) {
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                ),
+                child: AddTransactionSheet(
+                  initialTransaction: transaction,
+                  index: index,
+                ),
+              );
+            },
           );
         },
         borderRadius: BorderRadius.circular(16),
