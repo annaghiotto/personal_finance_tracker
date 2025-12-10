@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:personal_finance_tracker/cubit/theme/theme_cubit.dart';
 import 'package:personal_finance_tracker/cubit/transactions/transaction_cubit.dart';
+import 'package:personal_finance_tracker/ui/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/models/transaction.dart';
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
             themeMode: themeMode,
             theme: ThemeData.light(),
             darkTheme: ThemeData.dark(),
-            home: Placeholder(),
+            home: HomeScreen(),
           );
         },
       ),
