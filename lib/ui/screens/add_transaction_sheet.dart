@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:personal_finance_tracker/cubit/settings/settings_cubit.dart';
 import 'package:personal_finance_tracker/cubit/transactions/transaction_cubit.dart';
 import 'package:personal_finance_tracker/data/models/transaction.dart';
 
@@ -52,6 +53,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final currency = context.watch<SettingsCubit>().state.currencySymbol;
     
     return Container(
       decoration: BoxDecoration(
@@ -166,7 +168,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                       controller: _amountController,
                       decoration: InputDecoration(
                         hintText: '0.00',
-                        prefixIcon: Icon(Icons.attach_money),
+                        prefixIcon: Icon(currencyIcon(currency)),
                         filled: true,
                         fillColor: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5),
                         border: OutlineInputBorder(
@@ -379,6 +381,20 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
       ),
     );
   }
+  
+  IconData currencyIcon(String currency) {
+  switch (currency) {
+    case '€':
+      return Icons.euro;
+    case '\$':
+      return Icons.attach_money;
+    case '£':
+      return Icons.currency_pound;
+    default:
+      return Icons.attach_money;
+  }
+}
+
 }
 
 class _TypeButton extends StatelessWidget {
